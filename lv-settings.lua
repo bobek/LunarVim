@@ -50,3 +50,5 @@ O.tsserver.autoformat = true
 O.json.autoformat = true
 
 -- create custom autocommand field (This would be easy with lua)
+
+O.relative_number = false

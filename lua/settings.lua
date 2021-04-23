@@ -26,6 +26,7 @@ vim.bo.smartindent = true -- Makes indenting smart
 vim.wo.number = O.number -- set numbered lines
 vim.wo.relativenumber = O.relative_number -- set relative number
 vim.wo.cursorline = true -- Enable highlighting of the current line
+vim.wo.cursorcolumn = true -- Enable highlighting of the current column
 vim.o.showtabline = 2 -- Always show tabs
 vim.o.showmode = false -- We don't need to see things like -- INSERT -- anymore
 vim.o.backup = false -- This is recommended by coc
