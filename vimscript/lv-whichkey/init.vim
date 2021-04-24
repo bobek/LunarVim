@@ -135,6 +135,7 @@ let g:which_key_map.l = {
       \ 'x' : [':cclose'                             , 'close quickfix'],
       \ 's' : [':Telescope lsp_document_symbols'     , 'document symbols'],
       \ 'S' : [':Telescope lsp_workspace_symbols'    , 'workspace symbols'],
+      \ 'z' : [':LspTroubleToggle'                   , 'trouble browser' ],
       \ }
 
 call which_key#register('<Space>', "g:which_key_map")

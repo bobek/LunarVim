@@ -83,6 +83,8 @@ return require("packer").startup(
         -- Live markdown preview in the browser
         use {'iamcco/markdown-preview.nvim', run = 'cd app && yarn install', cmd = 'MarkdownPreview'}
 
+        use {"folke/lsp-trouble.nvim", requires = "kyazdani42/nvim-web-devicons"}
+
         require_plugin("nvim-lspconfig")
         require_plugin("lspsaga.nvim")
         require_plugin("nvim-lspinstall")
@@ -107,5 +109,6 @@ return require("packer").startup(
         require_plugin("barbar.nvim")
 
         require_plugin("markdown-preview.nvim")
+        require_plugin("lsp-trouble")
     end
 )
