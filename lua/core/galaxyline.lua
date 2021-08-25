@@ -1,15 +1,17 @@
 -- if not package.loaded['galaxyline'] then
 --   return
 -- end
+local Log = require "core.log"
 local status_ok, gl = pcall(require, "galaxyline")
 if not status_ok then
+  Log:get_default().error "Failed to load galaxyline"
   return
 end
 
 -- NOTE: if someone defines colors but doesn't have them then this will break
-local palette_status_ok, colors = pcall(require, O.colorscheme .. ".palette")
+local palette_status_ok, colors = pcall(require, lvim.colorscheme .. ".palette")
 if not palette_status_ok then
-  colors = O.plugin.galaxyline.colors
+  colors = lvim.builtin.galaxyline.colors
 end
 
 local condition = require "galaxyline.condition"
@@ -200,39 +202,27 @@ table.insert(gls.right, {
   },
 })
 
-local get_lsp_client = function(msg)
+local function get_attached_provider_name(msg)
   msg = msg or "LSP Inactive"
-  local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
-  local clients = vim.lsp.get_active_clients()
-  if next(clients) == nil then
+  local buf_clients = vim.lsp.buf_get_clients()
+  if next(buf_clients) == nil then
     return msg
   end
-  local lsps = ""
-  for _, client in ipairs(clients) do
-    local filetypes = client.config.filetypes
-    if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-      -- print(client.name)
-      if lsps == "" then
-        -- print("first", lsps)
-        lsps = client.name
-      else
-        if not string.find(lsps, client.name) then
-          lsps = lsps .. ", " .. client.name
-        end
-        -- print("more", lsps)
-      end
+  local buf_ft = vim.bo.filetype
+  local buf_client_names = {}
+  local null_ls_providers = require("lsp.null-ls").get_registered_providers_by_filetype(buf_ft)
+  for _, client in pairs(buf_clients) do
+    if client.name ~= "null-ls" then
+      table.insert(buf_client_names, client.name)
     end
   end
-  if lsps == "" then
-    return msg
-  else
-    return lsps
-  end
+  vim.list_extend(buf_client_names, null_ls_providers)
+  return table.concat(buf_client_names, ", ")
 end
 
 table.insert(gls.right, {
   ShowLspClient = {
-    provider = get_lsp_client,
+    provider = get_attached_provider_name,
     condition = function()
       local tbl = { ["dashboard"] = true, [" "] = true }
       if tbl[vim.bo.filetype] then
@@ -266,7 +256,11 @@ table.insert(gls.right, {
 table.insert(gls.right, {
   Tabstop = {
     provider = function()
-      return "Spaces: " .. vim.api.nvim_buf_get_option(0, "shiftwidth") .. " "
+      local label = "Spaces: "
+      if not vim.api.nvim_buf_get_option(0, "expandtab") then
+        label = "Tab size: "
+      end
+      return label .. vim.api.nvim_buf_get_option(0, "shiftwidth") .. " "
     end,
     condition = condition.hide_in_width,
     separator = " ",
@@ -311,7 +305,7 @@ table.insert(gls.short_line_left, {
     provider = "FileTypeName",
     separator = " ",
     separator_highlight = { "NONE", colors.alt_bg },
-    highlight = { colors.grey, colors.alt_bg },
+    highlight = { colors.alt_bg, colors.alt_bg },
   },
 })
 
@@ -319,7 +313,7 @@ table.insert(gls.short_line_left, {
   SFileName = {
     provider = "SFileName",
     condition = condition.buffer_not_empty,
-    highlight = { colors.grey, colors.alt_bg },
+    highlight = { colors.alt_bg, colors.alt_bg },
   },
 })
 
